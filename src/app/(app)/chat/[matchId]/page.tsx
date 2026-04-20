@@ -47,9 +47,10 @@ export default function ChatPage() {
 
   // Real-time new messages
   useEffect(() => {
-    return onNewMessage((msg) => {
+    const cleanup = onNewMessage((msg) => {
       setMessages((prev) => [...prev, msg]);
     });
+    return () => { cleanup?.(); };
   }, [onNewMessage]);
 
   // Typing indicator
@@ -61,6 +62,7 @@ export default function ChatPage() {
         typingTimerRef.current = setTimeout(() => setTypingUser(null), 2000);
       }
     });
+    return () => { cleanup?.(); };
   }, [onTyping, me]);
 
   // Auto-scroll
