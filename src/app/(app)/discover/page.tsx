@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Filter, RefreshCw, Loader2, Compass, Sparkles, X, Heart } from 'lucide-react';
 import { useDiscovery } from '@/hooks/useDiscovery';
@@ -36,6 +36,23 @@ export default function DiscoverPage() {
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
   const [matchId, setMatchId] = useState('');
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (!isAuthenticated) {
+      router.push('/auth/login');
+      return;
+    }
+    if (user && user.skillsToLearn.length === 0 && user.skillsKnown.length === 0) {
+      router.push('/onboarding');
+    }
+  }, [mounted, isAuthenticated, user, router]);
+
   useMatchNotifications(
     useCallback(
       async (matchedUserId: string) => {
@@ -49,15 +66,7 @@ export default function DiscoverPage() {
     )
   );
 
-  if (!isAuthenticated) {
-    router.push('/auth/login');
-    return null;
-  }
 
-  if (user && user.skillsToLearn.length === 0 && user.skillsKnown.length === 0) {
-    router.push('/onboarding');
-    return null;
-  }
 
   const handleSwipeAction = async (direction: 'left' | 'right') => {
     if (!currentCandidate) return;
@@ -78,6 +87,14 @@ export default function DiscoverPage() {
       try { await matchApi.swipe(targetId, 'left'); } catch { /* Non-blocking */ }
     }
   };
+
+  if (!mounted || !isAuthenticated) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950">
@@ -109,11 +126,10 @@ export default function DiscoverPage() {
                 <button
                   key={value}
                   onClick={() => setFilter(value === 'all' ? undefined : value)}
-                  className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                    isActive
+                  className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition-all ${isActive
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100 dark:shadow-none'
                       : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
-                  }`}
+                    }`}
                 >
                   {label}
                 </button>
@@ -174,13 +190,13 @@ export default function DiscoverPage() {
 
               {/* Action Buttons Layer (Visible only when cards exist) */}
               <div className="absolute -bottom-6 flex gap-6 z-50">
-                <button 
+                <button
                   onClick={() => handleSwipeAction('left')}
                   className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-rose-500 shadow-xl border border-slate-100 transition-transform active:scale-90 dark:bg-slate-900 dark:border-slate-800"
                 >
                   <X className="h-8 w-8" strokeWidth={3} />
                 </button>
-                <button 
+                <button
                   onClick={() => handleSwipeAction('right')}
                   className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-600 text-white shadow-xl shadow-indigo-200 transition-transform active:scale-90 dark:shadow-none"
                 >
