@@ -55,15 +55,15 @@ export default function ChatPage() {
 
   // Typing indicator
   useEffect(() => {
-    return onTyping(({ userId }) => {
-      if (userId !== me?._id) {
-        setTypingUser(userId);
-        if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
-        typingTimerRef.current = setTimeout(() => setTypingUser(null), 2000);
-      }
-    });
-    return () => { cleanup?.(); };
-  }, [onTyping, me]);
+  const unsub = onTyping(({ userId }) => {
+    if (userId !== me?._id) {
+      setTypingUser(userId);
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = setTimeout(() => setTypingUser(null), 2000);
+    }
+  });
+  return () => { unsub?.(); };
+}, [onTyping, me]);
 
   // Auto-scroll
   useEffect(() => {
