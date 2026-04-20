@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { clsx } from 'clsx';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
 type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -21,6 +21,8 @@ const variantClasses: Record<Variant, string> = {
     'text-[var(--text-muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text)] disabled:opacity-50',
   danger:
     'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 disabled:bg-red-300',
+  outline:
+    'border border-slate-200 bg-transparent hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-600',
 };
 
 const sizeClasses: Record<Size, string> = {

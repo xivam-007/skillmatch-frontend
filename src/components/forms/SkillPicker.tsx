@@ -17,7 +17,7 @@ const POPULAR_SKILLS = [
 ];
 
 interface SkillPickerProps {
-  label: string;
+  label?: string;
   value: string[];
   onChange: (skills: string[]) => void;
   variant?: 'known' | 'learn';
